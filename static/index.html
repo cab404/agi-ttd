@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <style>
+        html {
+            background-color: black;
+        }
+
+        #main {
+            visibility: hidden;
+            color: azure;
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+            text-align: center;
+            font-size: larger;
+            height: 100%;
+        }
+
+        a {
+            color: aliceblue;
+        }
+
+        .comment {
+            font-size: small;
+        }
+
+        #main h3 {
+            font-weight: 100;
+        }
+
+        #main h1 {
+            font-weight: 100;
+        }
+    </style>
+
+</head>
+
+
+<body>
+    <div id="main">
+        <h1>☠️</h1>
+        <div class="comment"><i>Approx. time till AGI is devised <a
+                    href="https://www.metaculus.com/questions/5121/date-of-general-ai/">(based on this Metaculus
+                    question)</a></i></div>
+        <h3 id="p25">25 percentile: 2500 hours</h3>
+        <h1 id="p50">6000 hours until AGI</h1>
+        <h3 id="p75">75 percentile: 8000 hours</h3>
+        <div class="comment">
+            Useful links:
+            <ul>
+                <li>
+                    <a
+                        href="https://www.lesswrong.com/posts/j9Q8bRmwCgXRYAgcJ/miri-announces-new-death-with-dignity-strategy">
+                        MIRI announces new "Death With Dignity" strategy
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        let state = undefined
+
+        function toHoursLeft(timestamp) {
+            return (timestamp - Date.now()) / 60 / 60 / 1000
+        }
+
+        function updateUI() {
+            if (state === undefined) return
+            document.getElementById("main").style.visibility = "visible"
+            document.getElementById("p25").textContent = `25%: ${toHoursLeft(state.prediction.p25).toFixed(3)}h`
+            document.getElementById("p50").textContent = `50%: ${toHoursLeft(state.prediction.p50).toFixed(3)}h`
+            document.getElementById("p75").textContent = `75%: ${toHoursLeft(state.prediction.p75).toFixed(3)}h`
+        }
+
+        async function fetchLoop() {
+            await fetch("/get_prob").then(async (a) => {
+                state = await a.json()
+                updateUI()
+                setTimeout(fetchLoop, 30000)
+            })
+        }
+
+        fetchLoop()
+
+        setInterval(updateUI, 100)
+
+    </script>
+</body>
+
+</html>
